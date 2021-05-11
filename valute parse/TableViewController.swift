@@ -7,6 +7,7 @@
 
 import UIKit
 import Alamofire
+import SwiftyJSON
 class TableViewController: UITableViewController {
     var array = [String]()
     let url = "http://data.fixer.io/api/latest"
@@ -27,7 +28,25 @@ class TableViewController: UITableViewController {
     }
     func getValute(url:String, parameters: [String:String]) {
         AF.request(url,method: .get,parameters: parameters).responseJSON { response in
-            print(response)
+            switch response.result {
+            case .success(let value):
+                let json = JSON(value)
+                print(json)
+                self.title = "\(json["date"])"
+                self.updatesValute(json: json)
+            case .failure(let error):
+                print(error)
+            }
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
+    func updatesValute(json: JSON) {
+        for (name, valute) in json["rates"] {
+            let currentValute = "\(name)    \(valute)"
+            array.append(currentValute)
         }
     }
     // MARK: - Table view data source
@@ -44,7 +63,7 @@ class TableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "myCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = array[indexPath.row]
 
         return cell
