@@ -11,14 +11,22 @@ class TableViewController: UITableViewController {
     var array = [String]()
     let url = "http://data.fixer.io/api/latest"
     let key = "98371253a513f2c59a1c2f03721e979c"
+    let base = "EUR"
+    let symbols = "EUR, USD, RUB, GBR, CHF, JPY, AED, CZK"
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let parameter = ["access_key": key,
+                          "base": base,
+                          "symbols": symbols
+        ]
+        
 // MARK: - Get request for all valute "http://data.fixer.io/api/latest?access_key=98371253a513f2c59a1c2f03721e979c"
-       getValute(url: "http://data.fixer.io/api/latest?access_key=98371253a513f2c59a1c2f03721e979c")
+        getValute(url: url, parameters: parameter)
     }
-    func getValute(url:String) {
-        AF.request(url).responseJSON { response in
+    func getValute(url:String, parameters: [String:String]) {
+        AF.request(url,method: .get,parameters: parameters).responseJSON { response in
             print(response)
         }
     }
